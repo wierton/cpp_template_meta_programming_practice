@@ -1,7 +1,7 @@
 .PHONY: run
 
 
-CXXFILES := smq_regex.cpp
+CXXFILES := gcd.cpp
 TARGET := a.out
 
 $(TARGET): $(CXXFILES)

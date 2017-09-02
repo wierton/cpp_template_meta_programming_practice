@@ -47,5 +47,6 @@ int main() {
 	std::cout << F3<3>::value << std::endl;
 	std::cout << F3<4>::value << std::endl;
 	std::cout << F3<5>::value << std::endl;
+
 	return 0;
 }
