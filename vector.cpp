@@ -6,7 +6,7 @@
 template<typename T>
 class Vector {
 	T *array;
-	uint32_t numOfArrayElements;
+	std::size_t numOfArrayElements;
 	std::size_t capacity;
 public:
 	enum Exception {
