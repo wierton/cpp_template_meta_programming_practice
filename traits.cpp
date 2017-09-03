@@ -1,13 +1,10 @@
 #include <iostream>
 
-template<class T1, class T2> struct is_same;
-
 template<class T1, class T2>
 struct is_same : std::integral_constant<bool, false> { };
 
 template<class T>
 struct is_same<T, T> : std::integral_constant<bool, true> { };
-
 
 
 template<class T>
@@ -53,7 +50,7 @@ template<class T>
 struct is_pointer<T*> : std::integral_constant<bool, true> {};
 
 int main() {
-#define print(...) std::cout << #__VA_ARGS__ << ": " << (__VA_ARGS__) << std::endl
+#define print(...) std::cout << #__VA_ARGS__ << ":\t" << (__VA_ARGS__) << std::endl
 	std::cout << "============== is_same ==============\n";
 	print(is_same<int, int>::value);
 	print(is_same<int, int>::value);
@@ -74,14 +71,14 @@ int main() {
 	print(is_float<int>::value);
 
 	std::cout << "============== is_array ==============\n";
-	print(is_float<int [2]>::value);
-	print(is_float<float [3]>::value);
+	print(is_array<int [2]>::value);
+	print(is_array<float [3]>::value);
 
 	std::cout << "============== is_pointer ==============\n";
-	print(is_float<int*>::value);
-	print(is_float<float*>::value);
-	print(is_float<int>::value);
-	print(is_float<float>::value);
+	print(is_pointer<int*>::value);
+	print(is_pointer<float*>::value);
+	print(is_pointer<int>::value);
+	print(is_pointer<float>::value);
 
 	std::cout << "============== is_void ==============\n";
 	print(is_void<void>::value);

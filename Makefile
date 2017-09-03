@@ -1,7 +1,7 @@
 .PHONY: run
 
 
-CXXFILES := traits.cpp
+CXXFILES := vector.cpp
 TARGET := a.out
 
 $(TARGET): $(CXXFILES)
