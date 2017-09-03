@@ -1,7 +1,6 @@
 .PHONY: run
 
-
-CXXFILES := vector.cpp
+CXXFILES := practice_2.cpp
 TARGET := a.out
 
 $(TARGET): $(CXXFILES)
