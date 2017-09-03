@@ -1,20 +1,34 @@
 #include <iostream>
 
-template<bool COND, class T, class F>
-struct {
+template<bool cond, class T, class F>
+struct IF {
 };
 
 template<class T, class F>
-struct<false, T, F> {
-	typedef F RET;
+struct IF<false, T, F> {
+	typedef F retType;
 };
 
 template<class T, class F>
-struct<true, T, F> {
-	typedef T RET;
+struct IF<true, T, F> {
+	typedef T retType;
 };
 
-template<class COND, class STATEMENT>
+template<template<class> class Cond, class Stmt>
 struct WHILE {
-	IF<COND, WHILE<COND, STATEMENT>::>
+	template<class Stmt>
+	struct STOP {
+		typedef Stmt retType;
+	};
+	
+	typedef typename IF<Cond<Stmt>::retType, WHILE<Cond, typename Stmt::NEXT>, typename STOP<Stmt>::retType >::retType retType;
 };
+
+template<int n>
+class Sum {
+};
+
+
+int main() {
+	return 0;
+}

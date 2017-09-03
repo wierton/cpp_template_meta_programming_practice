@@ -14,5 +14,7 @@ int main() {
 	std::cout << GCD<6, 2>::value << std::endl;
 	std::cout << GCD<7, 2>::value << std::endl;
 	std::cout << GCD<14, 14>::value << std::endl;
+	std::cout << GCD<28, 14>::value << std::endl;
+	std::cout << GCD<60, 120>::value << std::endl;
 	return 0;
 }

@@ -1,7 +1,7 @@
 .PHONY: run
 
 
-CXXFILES := gcd.cpp
+CXXFILES := binary.cpp
 TARGET := a.out
 
 $(TARGET): $(CXXFILES)
