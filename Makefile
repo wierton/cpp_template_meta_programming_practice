@@ -9,3 +9,6 @@ $(TARGET): $(CXXFILES)
 
 run:$(TARGET)
 	@./$(TARGET)
+
+clean:
+	@rm -rf $(TARGET)

@@ -3,6 +3,17 @@
 #include <algorithm>
 
 
+template<class... Args>
+void print(Args... args) {
+	std::initializer_list<int> {(std::cout << args << " ", 0)...};
+}
+
+template<class... Args>
+void println(Args... args) {
+	print(args...);
+	std::cout << std::endl;
+}
+
 template<typename T>
 class Vector {
 	T *array;
@@ -15,17 +26,18 @@ public:
 	};
 
 	Vector();
-	~Vector();
+	~Vector() noexcept;
 	Vector(std::initializer_list<T> initializer) ;
 	Vector(Vector &v);
 	Vector(Vector &&v);
-	Vector &operator=(std::initializer_list<T> initializer);
-	Vector &operator=(Vector &v);
-	Vector &operator=(Vector &&v);
+	Vector &operator=(std::initializer_list<T> initializer) noexcept;
+	Vector &operator=(Vector &v) noexcept;
+	Vector &operator=(Vector &&v) noexcept;
 	void pushBack(T e);
 	void popBack() throw(enum Exception);
+	Vector<T>& lastElement() throw(enum Exception);
 	T& operator[](std::size_t index) throw(enum Exception) ;
-	std::size_t size() noexcept; 
+	std::size_t size(); 
 };
 
 template<class T> Vector<T>::Vector() {
@@ -34,7 +46,7 @@ template<class T> Vector<T>::Vector() {
 	array = new T[capacity];
 }
 
-template<class T> Vector<T>::~Vector() {
+template<class T> Vector<T>::~Vector() noexcept {
 	std::cout << "called destructor\n";
 	delete []array;
 	numOfArrayElements = 0;
@@ -71,7 +83,7 @@ template<class T> Vector<T>::Vector(Vector &&v) {
 	v.capacity = 0;
 }
 
-template<class T> Vector<T>& Vector<T>::operator=(std::initializer_list<T> initializer) {
+template<class T> Vector<T>& Vector<T>::operator=(std::initializer_list<T> initializer) noexcept {
 	delete []array;
 
 	capacity = initializer.size();
@@ -82,7 +94,7 @@ template<class T> Vector<T>& Vector<T>::operator=(std::initializer_list<T> initi
 	return *this;
 }
 
-template<class T> Vector<T>& Vector<T>::operator=(Vector &v) {
+template<class T> Vector<T>& Vector<T>::operator=(Vector &v) noexcept {
 	delete []array;
 
 	std::cout << "swap by copy\n";
@@ -95,7 +107,7 @@ template<class T> Vector<T>& Vector<T>::operator=(Vector &v) {
 	}
 }
 
-template<class T> Vector<T>& Vector<T>::operator=(Vector &&v) {
+template<class T> Vector<T>& Vector<T>::operator=(Vector &&v) noexcept {
 	delete []array;
 
 	std::cout << "swap pointer\n";
@@ -110,7 +122,7 @@ template<class T> Vector<T>& Vector<T>::operator=(Vector &&v) {
 }
 
 template<class T> void Vector<T>::pushBack(T e) {
-	if(numOfArrayElements < capacity) {
+	if(__builtin_expect(numOfArrayElements < capacity, 1)) {
 		array[numOfArrayElements] = e;
 		numOfArrayElements ++;
 	} else {
@@ -132,13 +144,19 @@ template<class T> void Vector<T>::popBack() throw(enum Exception) {
 	numOfArrayElements --;
 }
 
+template<class T> Vector<T>& Vector<T>::lastElement() throw(enum Exception) {
+	if(numOfArrayElements <= 0)
+		throw ExceptionPopFromNullArray;
+	return this->array[this->numOfArrayElements - 1];
+}
+
 template<class T> T& Vector<T>::operator[](std::size_t index) throw(enum Exception) {
 	if(index >= numOfArrayElements)
 		throw ExceptionOutOfRange;
 	return array[index];
 }
 
-template<class T> std::size_t Vector<T>::size() noexcept {
+template<class T> std::size_t Vector<T>::size() {
 	return numOfArrayElements;
 }
 
@@ -156,24 +174,24 @@ int main() {
 	try {
 		v1.popBack();
 	} catch(Vector<int>::Exception e) {
-		std::cout << e << "\n";
+		println("caught exception by popping from null array");
 	}
 
 	try {
 		v1[0] = 0;
 	} catch(Vector<int>::Exception e) {
-		std::cout << e << "\n";
+		println("caught exception by access index out of range");
 	}
 
 	/* test swap by pointer */
-	v1.pushBack(1);
-	Vector<int> v2 = {2, 3, 4, 5, 6};
+	v1 = {1, 2, 3, 4, 5};
+	Vector<int> v2 = {5, 4, 3, 2, 1};
 
 	Vector<int> tmp1 = std::move(v1);
 	v1 = std::move(v2);
 	v2 = std::move(tmp1);
 
-	std::cout << v1[0] << ", " << v2[0] << std::endl;
+	println("first element of two vectors: ", "v1[0]=", v1[0], ", v2[0]=", v2[0]);
 
 	/* test swap by copy */
 	v1 = {1, 2, 3, 4, 5};
@@ -183,7 +201,7 @@ int main() {
 	v1 = v2;
 	v2 = tmp2;
 
-	std::cout << v1[0] << ", " << v2[0] << std::endl;
+	println("first element of two vectors: ", "v1[0]=", v1[0], ", v2[0]=", v2[0]);
 
 	return 0;
 }
