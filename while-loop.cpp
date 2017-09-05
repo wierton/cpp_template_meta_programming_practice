@@ -80,9 +80,9 @@ struct Sum {
 /* sum all prime integer in [1, n] */
 template<int n>
 struct isPrime {
-	struct BreakType : std::integral_constant<int, 2> { };
-	struct ContinueType : std::integral_constant<int, 1> { };
-	struct EndType : std::integral_constant<int, 0> { };
+	struct Break : std::integral_constant<int, 2> { };
+	struct Continue : std::integral_constant<int, 1> { };
+	struct End : std::integral_constant<int, 0> { };
 
 	template<template<class> class Cond, class Stmt>
 	struct WHILE_ {
@@ -90,9 +90,9 @@ struct isPrime {
 			typedef T retType;
 		};
 
-		typedef typename IF<Cond<Stmt>::value == BreakType::value, STOP<FalseType>,
+		typedef typename IF<Cond<Stmt>::value == Break::value, STOP<FalseType>,
 			typename IF<
-				Cond<Stmt>::value == ContinueType::value,
+				Cond<Stmt>::value == Continue::value,
 				WHILE_<Cond, typename Stmt::NEXT>,
 				STOP<TrueType>
 			>::retType
@@ -101,14 +101,13 @@ struct isPrime {
 
 	template<class Stmt>
 	struct Cond {
-		enum { value = IF<Stmt::ri >= n,
-							EndType,
+		static constexpr int value = IF<Stmt::ri >= n,
+							End,
 							typename IF<n % Stmt::ri == 0,
-									BreakType,
-									ContinueType
+									Break,
+									Continue
 								>::retType
-						>::retType::value
-		};
+						>::retType::value;
 	};
 
 	template<int i>
@@ -120,109 +119,367 @@ struct isPrime {
 	static constexpr int value = WHILE_<Cond, Stmt<2>>::retType::value;
 };
 
+template<int n>
+struct SumPrime {
+	template<int i>
+	struct AddWith : std::integral_constant<int, i> { };
+
+	static constexpr int value = IF<isPrime<n>::value, AddWith<n>, AddWith<0>>::retType::value + SumPrime<n - 1>::value;
+};
+
+template<>
+struct SumPrime<1> {
+	static constexpr int value = 0;
+};
+
+template<>
+struct SumPrime<0> {
+	static constexpr int value = 0;
+};
+
+template<int n>
+struct SumPrimeWhile {
+	template<int i>
+	struct AddWith : std::integral_constant<int, i> { };
+
+	template<template<class> class Cond, class Stmt>
+	struct WHILE {
+		template<class T>
+		struct STOP {
+			typedef T retType;
+		};
+
+		typedef typename
+			IF<Cond<Stmt>::value, WHILE<Cond, typename Stmt::NEXT>, STOP<Stmt>>::retType::retType retType;
+	};
+
+	template<class Stmt>
+	struct Cond : std::__bool_constant<Stmt::ri < n> { };
+
+	template<int i, int sum>
+	struct Stmt : std::integral_constant<int, sum> {
+		typedef Stmt<i + 1, sum + IF<isPrime<i>::value, AddWith<i>, AddWith<0>>::retType::value> NEXT;
+
+		static constexpr int ri = i;
+	};
+
+	static constexpr int value = WHILE<Cond, Stmt<2, 0>>::retType::value;
+};
+
+
 int main() {
+#define print(...) std::cout << #__VA_ARGS__ << ":\t" << (__VA_ARGS__) << std::endl
 	/* sum(n, e) = 1^e + 2^e + ... + n^e, use while-loop */
-	std::cout << "1: " << Sum<4, 2>::value << std::endl;
-	std::cout << "2: " << isPrime<2>::value << std::endl;
-	std::cout << "3: " << isPrime<3>::value << std::endl;
-	std::cout << "4: " << isPrime<4>::value << std::endl;
-	std::cout << "5: " << isPrime<5>::value << std::endl;
-	std::cout << "6: " << isPrime<6>::value << std::endl;
-	std::cout << "7: " << isPrime<7>::value << std::endl;
-	std::cout << "8: " << isPrime<8>::value << std::endl;
-	std::cout << "9: " << isPrime<9>::value << std::endl;
-	std::cout << "10: " << isPrime<10>::value << std::endl;
-	std::cout << "11: " << isPrime<11>::value << std::endl;
-	std::cout << "12: " << isPrime<12>::value << std::endl;
-	std::cout << "13: " << isPrime<13>::value << std::endl;
-	std::cout << "14: " << isPrime<14>::value << std::endl;
-	std::cout << "15: " << isPrime<15>::value << std::endl;
-	std::cout << "16: " << isPrime<16>::value << std::endl;
-	std::cout << "17: " << isPrime<17>::value << std::endl;
-	std::cout << "18: " << isPrime<18>::value << std::endl;
-	std::cout << "19: " << isPrime<19>::value << std::endl;
-	std::cout << "20: " << isPrime<20>::value << std::endl;
-	std::cout << "21: " << isPrime<21>::value << std::endl;
-	std::cout << "22: " << isPrime<22>::value << std::endl;
-	std::cout << "23: " << isPrime<23>::value << std::endl;
-	std::cout << "24: " << isPrime<24>::value << std::endl;
-	std::cout << "25: " << isPrime<25>::value << std::endl;
-	std::cout << "26: " << isPrime<26>::value << std::endl;
-	std::cout << "27: " << isPrime<27>::value << std::endl;
-	std::cout << "28: " << isPrime<28>::value << std::endl;
-	std::cout << "29: " << isPrime<29>::value << std::endl;
-	std::cout << "30: " << isPrime<30>::value << std::endl;
-	std::cout << "31: " << isPrime<31>::value << std::endl;
-	std::cout << "32: " << isPrime<32>::value << std::endl;
-	std::cout << "33: " << isPrime<33>::value << std::endl;
-	std::cout << "34: " << isPrime<34>::value << std::endl;
-	std::cout << "35: " << isPrime<35>::value << std::endl;
-	std::cout << "36: " << isPrime<36>::value << std::endl;
-	std::cout << "37: " << isPrime<37>::value << std::endl;
-	std::cout << "38: " << isPrime<38>::value << std::endl;
-	std::cout << "39: " << isPrime<39>::value << std::endl;
-	std::cout << "40: " << isPrime<40>::value << std::endl;
-	std::cout << "41: " << isPrime<41>::value << std::endl;
-	std::cout << "42: " << isPrime<42>::value << std::endl;
-	std::cout << "43: " << isPrime<43>::value << std::endl;
-	std::cout << "44: " << isPrime<44>::value << std::endl;
-	std::cout << "45: " << isPrime<45>::value << std::endl;
-	std::cout << "46: " << isPrime<46>::value << std::endl;
-	std::cout << "47: " << isPrime<47>::value << std::endl;
-	std::cout << "48: " << isPrime<48>::value << std::endl;
-	std::cout << "49: " << isPrime<49>::value << std::endl;
-	std::cout << "50: " << isPrime<50>::value << std::endl;
-	std::cout << "51: " << isPrime<51>::value << std::endl;
-	std::cout << "52: " << isPrime<52>::value << std::endl;
-	std::cout << "53: " << isPrime<53>::value << std::endl;
-	std::cout << "54: " << isPrime<54>::value << std::endl;
-	std::cout << "55: " << isPrime<55>::value << std::endl;
-	std::cout << "56: " << isPrime<56>::value << std::endl;
-	std::cout << "57: " << isPrime<57>::value << std::endl;
-	std::cout << "58: " << isPrime<58>::value << std::endl;
-	std::cout << "59: " << isPrime<59>::value << std::endl;
-	std::cout << "60: " << isPrime<60>::value << std::endl;
-	std::cout << "61: " << isPrime<61>::value << std::endl;
-	std::cout << "62: " << isPrime<62>::value << std::endl;
-	std::cout << "63: " << isPrime<63>::value << std::endl;
-	std::cout << "64: " << isPrime<64>::value << std::endl;
-	std::cout << "65: " << isPrime<65>::value << std::endl;
-	std::cout << "66: " << isPrime<66>::value << std::endl;
-	std::cout << "67: " << isPrime<67>::value << std::endl;
-	std::cout << "68: " << isPrime<68>::value << std::endl;
-	std::cout << "69: " << isPrime<69>::value << std::endl;
-	std::cout << "70: " << isPrime<70>::value << std::endl;
-	std::cout << "71: " << isPrime<71>::value << std::endl;
-	std::cout << "72: " << isPrime<72>::value << std::endl;
-	std::cout << "73: " << isPrime<73>::value << std::endl;
-	std::cout << "74: " << isPrime<74>::value << std::endl;
-	std::cout << "75: " << isPrime<75>::value << std::endl;
-	std::cout << "76: " << isPrime<76>::value << std::endl;
-	std::cout << "77: " << isPrime<77>::value << std::endl;
-	std::cout << "78: " << isPrime<78>::value << std::endl;
-	std::cout << "79: " << isPrime<79>::value << std::endl;
-	std::cout << "80: " << isPrime<80>::value << std::endl;
-	std::cout << "81: " << isPrime<81>::value << std::endl;
-	std::cout << "82: " << isPrime<82>::value << std::endl;
-	std::cout << "83: " << isPrime<83>::value << std::endl;
-	std::cout << "84: " << isPrime<84>::value << std::endl;
-	std::cout << "85: " << isPrime<85>::value << std::endl;
-	std::cout << "86: " << isPrime<86>::value << std::endl;
-	std::cout << "87: " << isPrime<87>::value << std::endl;
-	std::cout << "88: " << isPrime<88>::value << std::endl;
-	std::cout << "89: " << isPrime<89>::value << std::endl;
-	std::cout << "90: " << isPrime<90>::value << std::endl;
-	std::cout << "91: " << isPrime<91>::value << std::endl;
-	std::cout << "92: " << isPrime<92>::value << std::endl;
-	std::cout << "93: " << isPrime<93>::value << std::endl;
-	std::cout << "94: " << isPrime<94>::value << std::endl;
-	std::cout << "95: " << isPrime<95>::value << std::endl;
-	std::cout << "96: " << isPrime<96>::value << std::endl;
-	std::cout << "97: " << isPrime<97>::value << std::endl;
-	std::cout << "98: " << isPrime<98>::value << std::endl;
-	std::cout << "99: " << isPrime<99>::value << std::endl;
-	std::cout << "100: " << isPrime<100>::value << std::endl;
-	std::cout << "101: " << isPrime<101>::value << std::endl;
-	std::cout << "102: " << isPrime<102>::value << std::endl;
+	print(SumPrimeWhile<1>::value);
+	print(SumPrimeWhile<2>::value);
+	print(SumPrimeWhile<3>::value);
+	print(SumPrimeWhile<4>::value);
+	print(SumPrimeWhile<5>::value);
+	print(SumPrimeWhile<6>::value);
+	print(SumPrimeWhile<7>::value);
+	print(SumPrimeWhile<8>::value);
+	print(SumPrimeWhile<9>::value);
+	print(SumPrimeWhile<10>::value);
+	print(SumPrimeWhile<11>::value);
+	print(SumPrimeWhile<12>::value);
+	print(SumPrimeWhile<13>::value);
+	print(SumPrimeWhile<14>::value);
+	print(SumPrimeWhile<15>::value);
+	print(SumPrimeWhile<16>::value);
+	print(SumPrimeWhile<17>::value);
+	print(SumPrimeWhile<18>::value);
+	print(SumPrimeWhile<19>::value);
+	print(SumPrimeWhile<20>::value);
+	print(SumPrimeWhile<21>::value);
+	print(SumPrimeWhile<22>::value);
+	print(SumPrimeWhile<23>::value);
+	print(SumPrimeWhile<24>::value);
+	print(SumPrimeWhile<25>::value);
+	print(SumPrimeWhile<26>::value);
+	print(SumPrimeWhile<27>::value);
+	print(SumPrimeWhile<28>::value);
+	print(SumPrimeWhile<29>::value);
+	print(SumPrimeWhile<30>::value);
+	print(SumPrimeWhile<31>::value);
+	print(SumPrimeWhile<32>::value);
+	print(SumPrimeWhile<33>::value);
+	print(SumPrimeWhile<34>::value);
+	print(SumPrimeWhile<35>::value);
+	print(SumPrimeWhile<36>::value);
+	print(SumPrimeWhile<37>::value);
+	print(SumPrimeWhile<38>::value);
+	print(SumPrimeWhile<39>::value);
+	print(SumPrimeWhile<40>::value);
+	print(SumPrimeWhile<41>::value);
+	print(SumPrimeWhile<42>::value);
+	print(SumPrimeWhile<43>::value);
+	print(SumPrimeWhile<44>::value);
+	print(SumPrimeWhile<45>::value);
+	print(SumPrimeWhile<46>::value);
+	print(SumPrimeWhile<47>::value);
+	print(SumPrimeWhile<48>::value);
+	print(SumPrimeWhile<49>::value);
+	print(SumPrimeWhile<50>::value);
+	print(SumPrimeWhile<51>::value);
+	print(SumPrimeWhile<52>::value);
+	print(SumPrimeWhile<53>::value);
+	print(SumPrimeWhile<54>::value);
+	print(SumPrimeWhile<55>::value);
+	print(SumPrimeWhile<56>::value);
+	print(SumPrimeWhile<57>::value);
+	print(SumPrimeWhile<58>::value);
+	print(SumPrimeWhile<59>::value);
+	print(SumPrimeWhile<60>::value);
+	print(SumPrimeWhile<61>::value);
+	print(SumPrimeWhile<62>::value);
+	print(SumPrimeWhile<63>::value);
+	print(SumPrimeWhile<64>::value);
+	print(SumPrimeWhile<65>::value);
+	print(SumPrimeWhile<66>::value);
+	print(SumPrimeWhile<67>::value);
+	print(SumPrimeWhile<68>::value);
+	print(SumPrimeWhile<69>::value);
+	print(SumPrimeWhile<70>::value);
+	print(SumPrimeWhile<71>::value);
+	print(SumPrimeWhile<72>::value);
+	print(SumPrimeWhile<73>::value);
+	print(SumPrimeWhile<74>::value);
+	print(SumPrimeWhile<75>::value);
+	print(SumPrimeWhile<76>::value);
+	print(SumPrimeWhile<77>::value);
+	print(SumPrimeWhile<78>::value);
+	print(SumPrimeWhile<79>::value);
+	print(SumPrimeWhile<80>::value);
+	print(SumPrimeWhile<81>::value);
+	print(SumPrimeWhile<82>::value);
+	print(SumPrimeWhile<83>::value);
+	print(SumPrimeWhile<84>::value);
+	print(SumPrimeWhile<85>::value);
+	print(SumPrimeWhile<86>::value);
+	print(SumPrimeWhile<87>::value);
+	print(SumPrimeWhile<88>::value);
+	print(SumPrimeWhile<89>::value);
+	print(SumPrimeWhile<90>::value);
+	print(SumPrimeWhile<91>::value);
+	print(SumPrimeWhile<92>::value);
+	print(SumPrimeWhile<93>::value);
+	print(SumPrimeWhile<94>::value);
+	print(SumPrimeWhile<95>::value);
+	print(SumPrimeWhile<96>::value);
+	print(SumPrimeWhile<97>::value);
+	print(SumPrimeWhile<98>::value);
+	print(SumPrimeWhile<99>::value);
+	print(SumPrimeWhile<100>::value);
+	print(SumPrimeWhile<101>::value);
+	print(SumPrimeWhile<102>::value);
+	/*
+	print(Sum<4, 2>::value);
+	print(SumPrime<1>::value);
+	print(SumPrime<2>::value);
+	print(SumPrime<3>::value);
+	print(SumPrime<4>::value);
+	print(SumPrime<5>::value);
+	print(SumPrime<6>::value);
+	print(SumPrime<7>::value);
+	print(SumPrime<8>::value);
+	print(SumPrime<9>::value);
+	print(SumPrime<10>::value);
+	print(SumPrime<11>::value);
+	print(SumPrime<12>::value);
+	print(SumPrime<13>::value);
+	print(SumPrime<14>::value);
+	print(SumPrime<15>::value);
+	print(SumPrime<16>::value);
+	print(SumPrime<17>::value);
+	print(SumPrime<18>::value);
+	print(SumPrime<19>::value);
+	print(SumPrime<20>::value);
+	print(SumPrime<21>::value);
+	print(SumPrime<22>::value);
+	print(SumPrime<23>::value);
+	print(SumPrime<24>::value);
+	print(SumPrime<25>::value);
+	print(SumPrime<26>::value);
+	print(SumPrime<27>::value);
+	print(SumPrime<28>::value);
+	print(SumPrime<29>::value);
+	print(SumPrime<30>::value);
+	print(SumPrime<31>::value);
+	print(SumPrime<32>::value);
+	print(SumPrime<33>::value);
+	print(SumPrime<34>::value);
+	print(SumPrime<35>::value);
+	print(SumPrime<36>::value);
+	print(SumPrime<37>::value);
+	print(SumPrime<38>::value);
+	print(SumPrime<39>::value);
+	print(SumPrime<40>::value);
+	print(SumPrime<41>::value);
+	print(SumPrime<42>::value);
+	print(SumPrime<43>::value);
+	print(SumPrime<44>::value);
+	print(SumPrime<45>::value);
+	print(SumPrime<46>::value);
+	print(SumPrime<47>::value);
+	print(SumPrime<48>::value);
+	print(SumPrime<49>::value);
+	print(SumPrime<50>::value);
+	print(SumPrime<51>::value);
+	print(SumPrime<52>::value);
+	print(SumPrime<53>::value);
+	print(SumPrime<54>::value);
+	print(SumPrime<55>::value);
+	print(SumPrime<56>::value);
+	print(SumPrime<57>::value);
+	print(SumPrime<58>::value);
+	print(SumPrime<59>::value);
+	print(SumPrime<60>::value);
+	print(SumPrime<61>::value);
+	print(SumPrime<62>::value);
+	print(SumPrime<63>::value);
+	print(SumPrime<64>::value);
+	print(SumPrime<65>::value);
+	print(SumPrime<66>::value);
+	print(SumPrime<67>::value);
+	print(SumPrime<68>::value);
+	print(SumPrime<69>::value);
+	print(SumPrime<70>::value);
+	print(SumPrime<71>::value);
+	print(SumPrime<72>::value);
+	print(SumPrime<73>::value);
+	print(SumPrime<74>::value);
+	print(SumPrime<75>::value);
+	print(SumPrime<76>::value);
+	print(SumPrime<77>::value);
+	print(SumPrime<78>::value);
+	print(SumPrime<79>::value);
+	print(SumPrime<80>::value);
+	print(SumPrime<81>::value);
+	print(SumPrime<82>::value);
+	print(SumPrime<83>::value);
+	print(SumPrime<84>::value);
+	print(SumPrime<85>::value);
+	print(SumPrime<86>::value);
+	print(SumPrime<87>::value);
+	print(SumPrime<88>::value);
+	print(SumPrime<89>::value);
+	print(SumPrime<90>::value);
+	print(SumPrime<91>::value);
+	print(SumPrime<92>::value);
+	print(SumPrime<93>::value);
+	print(SumPrime<94>::value);
+	print(SumPrime<95>::value);
+	print(SumPrime<96>::value);
+	print(SumPrime<97>::value);
+	print(SumPrime<98>::value);
+	print(SumPrime<99>::value);
+	print(SumPrime<100>::value);
+	print(SumPrime<101>::value);
+	print(SumPrime<102>::value);
+
+	print(isPrime<1>::value);
+	print(isPrime<2>::value);
+	print(isPrime<3>::value);
+	print(isPrime<4>::value);
+	print(isPrime<5>::value);
+	print(isPrime<6>::value);
+	print(isPrime<7>::value);
+	print(isPrime<8>::value);
+	print(isPrime<9>::value);
+	print(isPrime<10>::value);
+	print(isPrime<11>::value);
+	print(isPrime<12>::value);
+	print(isPrime<13>::value);
+	print(isPrime<14>::value);
+	print(isPrime<15>::value);
+	print(isPrime<16>::value);
+	print(isPrime<17>::value);
+	print(isPrime<18>::value);
+	print(isPrime<19>::value);
+	print(isPrime<20>::value);
+	print(isPrime<21>::value);
+	print(isPrime<22>::value);
+	print(isPrime<23>::value);
+	print(isPrime<24>::value);
+	print(isPrime<25>::value);
+	print(isPrime<26>::value);
+	print(isPrime<27>::value);
+	print(isPrime<28>::value);
+	print(isPrime<29>::value);
+	print(isPrime<30>::value);
+	print(isPrime<31>::value);
+	print(isPrime<32>::value);
+	print(isPrime<33>::value);
+	print(isPrime<34>::value);
+	print(isPrime<35>::value);
+	print(isPrime<36>::value);
+	print(isPrime<37>::value);
+	print(isPrime<38>::value);
+	print(isPrime<39>::value);
+	print(isPrime<40>::value);
+	print(isPrime<41>::value);
+	print(isPrime<42>::value);
+	print(isPrime<43>::value);
+	print(isPrime<44>::value);
+	print(isPrime<45>::value);
+	print(isPrime<46>::value);
+	print(isPrime<47>::value);
+	print(isPrime<48>::value);
+	print(isPrime<49>::value);
+	print(isPrime<50>::value);
+	print(isPrime<51>::value);
+	print(isPrime<52>::value);
+	print(isPrime<53>::value);
+	print(isPrime<54>::value);
+	print(isPrime<55>::value);
+	print(isPrime<56>::value);
+	print(isPrime<57>::value);
+	print(isPrime<58>::value);
+	print(isPrime<59>::value);
+	print(isPrime<60>::value);
+	print(isPrime<61>::value);
+	print(isPrime<62>::value);
+	print(isPrime<63>::value);
+	print(isPrime<64>::value);
+	print(isPrime<65>::value);
+	print(isPrime<66>::value);
+	print(isPrime<67>::value);
+	print(isPrime<68>::value);
+	print(isPrime<69>::value);
+	print(isPrime<70>::value);
+	print(isPrime<71>::value);
+	print(isPrime<72>::value);
+	print(isPrime<73>::value);
+	print(isPrime<74>::value);
+	print(isPrime<75>::value);
+	print(isPrime<76>::value);
+	print(isPrime<77>::value);
+	print(isPrime<78>::value);
+	print(isPrime<79>::value);
+	print(isPrime<80>::value);
+	print(isPrime<81>::value);
+	print(isPrime<82>::value);
+	print(isPrime<83>::value);
+	print(isPrime<84>::value);
+	print(isPrime<85>::value);
+	print(isPrime<86>::value);
+	print(isPrime<87>::value);
+	print(isPrime<88>::value);
+	print(isPrime<89>::value);
+	print(isPrime<90>::value);
+	print(isPrime<91>::value);
+	print(isPrime<92>::value);
+	print(isPrime<93>::value);
+	print(isPrime<94>::value);
+	print(isPrime<95>::value);
+	print(isPrime<96>::value);
+	print(isPrime<97>::value);
+	print(isPrime<98>::value);
+	print(isPrime<99>::value);
+	print(isPrime<100>::value);
+	print(isPrime<101>::value);
+	print(isPrime<102>::value);
+	*/
+#undef print
 	return 0;
 }
