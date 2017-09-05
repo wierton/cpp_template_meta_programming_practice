@@ -13,7 +13,10 @@ template <typename Then, typename Else> struct IF<false, Then, Else> {
 // 隐含要求： Condition 返回值 ret，Statement 有类型 Next
 template <template <typename> class Condition, typename Statement>
 struct WHILE {
-	template <typename Statement_> struct STOP { typedef Statement_ reType; };
+	template <typename Statement_>
+	struct STOP {
+		typedef Statement_ reType;
+	};
 
 	typedef typename IF<Condition<Statement>::ret,
 			WHILE<Condition, typename Statement::Next>,

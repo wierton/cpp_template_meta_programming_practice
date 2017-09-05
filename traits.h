@@ -6,6 +6,10 @@
 
 namespace traits {
 
+template<class T>
+struct not_ : std::integral_constant<bool, !T::value> { };
+
+
 template<class T1, class T2>
 struct is_same : std::integral_constant<bool, false> { };
 
