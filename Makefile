@@ -1,6 +1,7 @@
 .PHONY: run
 
 CXXFILES := practice_2.cpp
+# CXXFILES := while-loop.cpp
 TARGET := a.out
 
 $(TARGET): $(CXXFILES)

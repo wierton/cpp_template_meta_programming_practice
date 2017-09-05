@@ -1,4 +1,7 @@
 #include <iostream>
+#include <cassert>
+#include <string>
+#include <vector>
 
 /* for test */
 template<class T1, class T2>
@@ -112,10 +115,132 @@ void test_replace_type() {
 
 
 /*
+ * 2.2 boost::polymorphic_downcase function template implements a static_cast with check
  *
  */
+template<class Target, class Source>
+inline constexpr Target * polymorphic_downcast(Source * ptr) {
+	return static_cast<Target *>(ptr);
+}
+
+/*
+ * 2.3
+ * */
+template<class T>
+struct type_descriptor {
+	static std::string formatToString() {
+		return std::string("");
+	}
+};
+
+#define TYPE_DESCRIPTOR(bt)							\
+template<>											\
+struct type_descriptor<bt> {						\
+	static std::string formatToString() {			\
+		return std::string(#bt);					\
+	}												\
+};
+
+
+TYPE_DESCRIPTOR(char)
+TYPE_DESCRIPTOR(short)
+TYPE_DESCRIPTOR(int)
+TYPE_DESCRIPTOR(long long)
+TYPE_DESCRIPTOR(unsigned char)
+TYPE_DESCRIPTOR(unsigned short)
+TYPE_DESCRIPTOR(unsigned int)
+TYPE_DESCRIPTOR(unsigned long long)
+
+#undef TYPE_DESCRIPTOR
+
+template<class T>
+struct type_descriptor<T *> {
+	static std::string formatToString() {
+		return std::string(type_descriptor<T>::formatToString()) + std::string(" *");
+	}
+};
+
+template<class T>
+struct type_descriptor<T []> {
+	static std::string formatToString() {
+		return std::string(type_descriptor<T>::formatToString()) + std::string(" []");
+	}
+};
+
+template<class T, unsigned N>
+struct type_descriptor<T [N]> {
+	static std::string formatToString() {
+		return std::string(type_descriptor<T>::formatToString()) + std::string(" [") + std::to_string(N) + std::string("]");
+	}
+};
+
+template<class T>
+struct type_descriptor<T &> {
+	static std::string formatToString() {
+		return std::string(type_descriptor<T>::formatToString()) + std::string(" &");
+	}
+};
+
+template<class T>
+struct type_descriptor<T &&> {
+	static std::string formatToString() {
+		return std::string(type_descriptor<T>::formatToString()) + std::string(" &&");
+	}
+};
+
+template<class T, class... Args>
+struct type_descriptor<T (*)(Args...)> {
+	static std::string formatToString() {
+		std::vector<std::string> argsFormatStrings = std::move( std::vector<std::string> { type_descriptor<Args>::formatToString()... } );
+		std::string retString = type_descriptor<T>::formatToString() + std::string(" (*)(");
+
+		if(argsFormatStrings.size() > 0)
+			retString += argsFormatStrings[0];
+
+		for(int i = 1; i < argsFormatStrings.size(); i++) {
+			retString += ( ", " + argsFormatStrings[i] );
+		}
+
+		retString += ")";
+		return retString;
+	}
+};
+
+template<class T, class... Args>
+struct type_descriptor<T (Args...)> {
+	static std::string formatToString() {
+		std::vector<std::string> argsFormatStrings = std::move( std::vector<std::string> { type_descriptor<Args>::formatToString()... } );
+		std::string retString = type_descriptor<T>::formatToString() + std::string(" (");
+
+		if(argsFormatStrings.size() > 0)
+			retString += argsFormatStrings[0];
+
+		for(int i = 1; i < argsFormatStrings.size(); i++) {
+			retString += ( ", " + argsFormatStrings[i] );
+		}
+
+		retString += ")";
+		return retString;
+	}
+};
+
+void test_type_descriptor() {
+	std::cout << type_descriptor<char *>::formatToString() << std::endl;
+	std::cout << type_descriptor<int *>::formatToString() << std::endl;
+	std::cout << type_descriptor<int []>::formatToString() << std::endl;
+	std::cout << type_descriptor<int [3]>::formatToString() << std::endl;
+	std::cout << type_descriptor<int (*)()>::formatToString() << std::endl;
+	std::cout << type_descriptor<int (*)(short)>::formatToString() << std::endl;
+	std::cout << type_descriptor<int (*)(char, short)>::formatToString() << std::endl;
+	std::cout << type_descriptor<int ()>::formatToString() << std::endl;
+	std::cout << type_descriptor<int (short)>::formatToString() << std::endl;
+	std::cout << type_descriptor<int (char, short)>::formatToString() << std::endl;
+	std::cout << type_descriptor<int (char, short, unsigned long long)>::formatToString() << std::endl;
+}
+
 
 int main() {
 	test_add_const_ref();
+	test_type_descriptor();
 	return 0;
 }
