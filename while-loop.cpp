@@ -11,8 +11,8 @@ void println(Args... args) {
 	std::cout << std::endl;
 }
 
-struct TrueType { static constexpr int value = 1; };
-struct FalseType { static constexpr int value = 0; };
+typedef std::__bool_constant<true> TrueType;
+typedef std::__bool_constant<false> FalseType;
 
 template<bool cond, class T, class F>
 struct IF {
@@ -80,9 +80,9 @@ struct Sum {
 /* sum all prime integer in [1, n] */
 template<int n>
 struct isPrime {
-	static constexpr int CondFalse = 0;
-	static constexpr int CondTrue = 1;
-	static constexpr int CondBreak = 2;
+	struct BreakType : std::integral_constant<int, 2> { };
+	struct ContinueType : std::integral_constant<int, 1> { };
+	struct EndType : std::integral_constant<int, 0> { };
 
 	template<template<class> class Cond, class Stmt>
 	struct WHILE_ {
@@ -90,9 +90,9 @@ struct isPrime {
 			typedef T retType;
 		};
 
-		typedef typename IF<Cond<Stmt>::value == CondBreak, STOP<FalseType>,
+		typedef typename IF<Cond<Stmt>::value == BreakType::value, STOP<FalseType>,
 			typename IF<
-				Cond<Stmt>::value,
+				Cond<Stmt>::value == ContinueType::value,
 				WHILE_<Cond, typename Stmt::NEXT>,
 				STOP<TrueType>
 			>::retType
@@ -101,19 +101,14 @@ struct isPrime {
 
 	template<class Stmt>
 	struct Cond {
-		struct BreakType {
-			static constexpr int value = CondBreak;
+		enum { value = IF<Stmt::ri >= n,
+							EndType,
+							typename IF<n % Stmt::ri == 0,
+									BreakType,
+									ContinueType
+								>::retType
+						>::retType::value
 		};
-
-		struct ContinueType {
-			static constexpr int value = CondTrue;
-		};
-
-		struct EndType {
-			static constexpr int value = CondFalse;
-		};
-
-		enum { value = IF<Stmt::ri >= n, EndType, typename IF<n % Stmt::ri == 0, BreakType, ContinueType>::retType>::retType::value };
 	};
 
 	template<int i>
