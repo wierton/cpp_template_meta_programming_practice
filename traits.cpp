@@ -2,9 +2,12 @@
 
 #include "traits.h"
 
+#include <type_traits>
 
 int main() {
 #define print(...) std::cout << #__VA_ARGS__ << ":\t" << (__VA_ARGS__) << std::endl
+	int p1[][4] = {{1, 2, 3, 4}, {5, 6, 7, 8}};
+	print(traits::type_descriptor<std::decay<decltype(p1)>::type>::formatToString());
 	std::cout << "============== is_same ==============\n";
 	print(traits::is_same<int, int>::value);
 	print(traits::is_same<int, int>::value);

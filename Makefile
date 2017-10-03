@@ -2,7 +2,7 @@
 
 # CXXFILES := practice_2.cpp
 # CXXFILES := traits.cpp
-CXXFILES := while-loop.cpp
+CXXFILES := print.cpp
 TARGET := a.out
 
 $(TARGET): $(CXXFILES)
