@@ -1,0 +1,25 @@
+{
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "(gdb) Pipe Attach",
+                "type": "cppdbg",
+                "request": "attach",
+                "program": "${workspaceRoot}/a.out",
+                "processId": "${command:pickRemoteProcess}",
+                "pipeTransport": {
+                    "debuggerPath": "/usr/bin/gdb",
+                    "pipeProgram": "/usr/bin/ssh",
+                    "pipeArgs": [],
+                    "pipeCwd": ""
+                },
+                "MIMode": "gdb"
+            },
+            {
+                "type": "node",
+                "request": "launch",
+                "name": "Launch Program",
+                "program": "${file}"
+            }
+        ]
+    }

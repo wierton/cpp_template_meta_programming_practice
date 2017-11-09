@@ -124,26 +124,26 @@ inline constexpr Target * polymorphic_downcast(Source * ptr) {
  * 2.3
  * */
 
-void test_type_descriptor() {
-	std::cout << type_descriptor<signed char *>::formatToString() << std::endl;
-	std::cout << type_descriptor<long int *>::formatToString() << std::endl;
-	std::cout << type_descriptor<char *>::formatToString() << std::endl;
-	std::cout << type_descriptor<int *>::formatToString() << std::endl;
-	std::cout << type_descriptor<int []>::formatToString() << std::endl;
-	std::cout << type_descriptor<int [3]>::formatToString() << std::endl;
-	std::cout << type_descriptor<int (*)()>::formatToString() << std::endl;
-	std::cout << type_descriptor<int (*)(short)>::formatToString() << std::endl;
-	std::cout << type_descriptor<int (*)(char, short)>::formatToString() << std::endl;
-	std::cout << type_descriptor<int (*)(char, short, unsigned long long)>::formatToString() << std::endl;
-	std::cout << type_descriptor<int ()>::formatToString() << std::endl;
-	std::cout << type_descriptor<int (short)>::formatToString() << std::endl;
-	std::cout << type_descriptor<int (char, short)>::formatToString() << std::endl;
-	std::cout << type_descriptor<int (char, short, unsigned long long)>::formatToString() << std::endl;
+void test_format() {
+	std::cout << format<signed char *>::to_string() << std::endl;
+	std::cout << format<long int *>::to_string() << std::endl;
+	std::cout << format<char *>::to_string() << std::endl;
+	std::cout << format<int *>::to_string() << std::endl;
+	std::cout << format<int []>::to_string() << std::endl;
+	std::cout << format<int [3]>::to_string() << std::endl;
+	std::cout << format<int (*)()>::to_string() << std::endl;
+	std::cout << format<int (*)(short)>::to_string() << std::endl;
+	std::cout << format<int (*)(char, short)>::to_string() << std::endl;
+	std::cout << format<int (*)(char, short, unsigned long long)>::to_string() << std::endl;
+	std::cout << format<int ()>::to_string() << std::endl;
+	std::cout << format<int (short)>::to_string() << std::endl;
+	std::cout << format<int (char, short)>::to_string() << std::endl;
+	std::cout << format<int (char, short, unsigned long long)>::to_string() << std::endl;
 }
 
 
 int main() {
 	test_add_const_ref();
-	test_type_descriptor();
+	test_format();
 	return 0;
 }

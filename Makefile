@@ -1,8 +1,9 @@
 .PHONY: run
 
-# CXXFILES := practice_2.cpp
-# CXXFILES := traits.cpp
-CXXFILES := print.cpp
+# CXXFILES := practice_2.cc
+# CXXFILES := traits.cc
+# CXXFILES := print.cc
+CXXFILES := forward.cc
 TARGET := a.out
 
 $(TARGET): $(CXXFILES)

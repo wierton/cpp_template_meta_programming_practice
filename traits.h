@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <cstddef>
 
 namespace traits {
 
@@ -61,23 +62,24 @@ struct is_pointer<T*> : std::integral_constant<bool, true> {};
 
 
 
-/* type_descriptor */
+/* format */
 template<class T>
-struct type_descriptor {
-	static std::string formatToString() {
+struct format {
+	static std::string to_string() {
 		return std::string("<BAD>");
 	}
 };
 
 #define TYPE_DESCRIPTOR(bt)							\
 template<>											\
-struct type_descriptor<bt> {						\
-	static std::string formatToString() {			\
+struct format<bt> {						\
+	static std::string to_string() {			\
 		return std::string(#bt);					\
 	}												\
 };
 
 
+TYPE_DESCRIPTOR(void)
 TYPE_DESCRIPTOR(char)
 TYPE_DESCRIPTOR(short)
 TYPE_DESCRIPTOR(int)
@@ -88,48 +90,49 @@ TYPE_DESCRIPTOR(unsigned short)
 TYPE_DESCRIPTOR(unsigned int)
 TYPE_DESCRIPTOR(unsigned long long)
 TYPE_DESCRIPTOR(signed char)
+TYPE_DESCRIPTOR(nullptr_t)
 
 #undef TYPE_DESCRIPTOR
 
 template<class T>
-struct type_descriptor<T *> {
-	static std::string formatToString() {
-		return std::string(type_descriptor<T>::formatToString()) + std::string(" *");
+struct format<T *> {
+	static std::string to_string() {
+		return std::string(format<T>::to_string()) + std::string(" *");
 	}
 };
 
 template<class T>
-struct type_descriptor<const T> {
-	static std::string formatToString() {
-		return std::string("const ") + std::string(type_descriptor<T>::formatToString());
+struct format<const T> {
+	static std::string to_string() {
+		return std::string("const ") + std::string(format<T>::to_string());
 	}
 };
 
 template<class T>
-struct type_descriptor<T []> {
-	static std::string formatToString() {
-		return std::string(type_descriptor<T>::formatToString()) + std::string(" []");
+struct format<T []> {
+	static std::string to_string() {
+		return std::string(format<T>::to_string()) + std::string(" []");
 	}
 };
 
 template<class T, unsigned N>
-struct type_descriptor<T [N]> {
-	static std::string formatToString() {
-		return std::string(type_descriptor<T>::formatToString()) + std::string(" [") + std::to_string(N) + std::string("]");
+struct format<T [N]> {
+	static std::string to_string() {
+		return std::string(format<T>::to_string()) + std::string(" [") + std::to_string(N) + std::string("]");
 	}
 };
 
 template<class T>
-struct type_descriptor<T &> {
-	static std::string formatToString() {
-		return std::string(type_descriptor<T>::formatToString()) + std::string(" &");
+struct format<T &> {
+	static std::string to_string() {
+		return std::string(format<T>::to_string()) + std::string(" &");
 	}
 };
 
 template<class T>
-struct type_descriptor<T &&> {
-	static std::string formatToString() {
-		return std::string(type_descriptor<T>::formatToString()) + std::string(" &&");
+struct format<T &&> {
+	static std::string to_string() {
+		return std::string(format<T>::to_string()) + std::string(" &&");
 	}
 };
 
@@ -137,8 +140,8 @@ struct type_descriptor<T &&> {
 /* format function arguments */
 template<class... Args>
 struct function_arguments_descriptor {
-	static std::string formatToString() {
-		std::vector<std::string> argsFormatStrings = std::move( std::vector<std::string> { type_descriptor<Args>::formatToString()... } );
+	static std::string to_string() {
+		std::vector<std::string> argsFormatStrings = std::move( std::vector<std::string> { format<Args>::to_string()... } );
 
 		std::string retString = "(";
 
@@ -155,16 +158,16 @@ struct function_arguments_descriptor {
 };
 
 template<class T, class... Args>
-struct type_descriptor<T (*)(Args...)> {
-	static std::string formatToString() {
-		return type_descriptor<T>::formatToString()  + "(*)" + function_arguments_descriptor<Args...>::formatToString();
+struct format<T (*)(Args...)> {
+	static std::string to_string() {
+		return format<T>::to_string()  + "(*)" + function_arguments_descriptor<Args...>::to_string();
 	}
 };
 
 template<class T, class... Args>
-struct type_descriptor<T (Args...)> {
-	static std::string formatToString() {
-		return type_descriptor<T>::formatToString()  + function_arguments_descriptor<Args...>::formatToString();
+struct format<T (Args...)> {
+	static std::string to_string() {
+		return format<T>::to_string()  + function_arguments_descriptor<Args...>::to_string();
 	}
 };
 
