@@ -4,7 +4,8 @@
 # CXXFILES := traits.cc
 # CXXFILES := print.cc
 # CXXFILES := test.cc
-CXXFILES := higher-order-function.cc
+# CXXFILES := higher-order-function.cc
+CXXFILES := tuple.cc
 TARGET := a.out
 
 $(TARGET): $(CXXFILES)
