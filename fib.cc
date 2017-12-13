@@ -1,7 +1,10 @@
 #include <iostream>
 
 
-template<unsigned n> struct Fib : std::integral_constant<unsigned, Fib<n - 1>::value + Fib<n - 2>::value> {};
+template<unsigned n>
+struct Fib 
+: std::integral_constant<unsigned, Fib<n - 1>::value + Fib<n - 2>::value> 
+{};
 
 template<> struct Fib<1> : std::integral_constant<unsigned, 1> {};
 

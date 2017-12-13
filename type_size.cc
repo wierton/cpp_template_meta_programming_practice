@@ -1,17 +1,14 @@
 #include <iostream>
 
 
-template<class... Args>
-struct Sum;
+template<class First, class... Rest>
+struct Sum {
+	enum { size = Sum<First>::size + Sum<Rest...>::size };
+};
 
 template<class Last>
 struct Sum<Last> {
 	enum { size = sizeof(Last) };
-};
-
-template<class First, class... Rest>
-struct Sum<First, Rest...> {
-	enum { size = Sum<First>::size + Sum<Rest...>::size };
 };
 
 

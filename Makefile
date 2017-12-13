@@ -3,7 +3,8 @@
 # CXXFILES := practice_2.cc
 # CXXFILES := traits.cc
 # CXXFILES := print.cc
-CXXFILES := forward.cc
+# CXXFILES := test.cc
+CXXFILES := higher-order-function.cc
 TARGET := a.out
 
 $(TARGET): $(CXXFILES)

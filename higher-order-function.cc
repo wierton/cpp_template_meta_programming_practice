@@ -1,47 +1,37 @@
 #include <iostream>
+#include <utility>
 
 #include "traits.h"
 
 
-/*
+template<class F, class X>
+struct twice {
+	using once = typename F::template apply<X>::type;
+	using type = typename F::template apply<once>::type;
+};
+
 struct add_pointer {
-	template<class X>
+	template<class T>
 	struct apply {
-		typedef X * type;
+		using type = T *;
 	};
 };
 
+
 template<class F, class X>
-struct twice {
-	typedef typename F::template apply<X>::type once;
-	typedef typename F::template apply<once>::type type;
-};
-*/
+struct apply : F::template apply<X> {};
 
-template<class T>
-struct add_pointer {
-	typedef T * type;
-};
+template<class F, class X>
+struct twice2 : apply<F, typename apply<F, X>::type> {};
 
-template<template <class> class F, class X>
-struct twice {
-	typedef typename F<X>::type once;
-	typedef typename F<once>::type type;
-};
 
-template<unsigned N, template <class> class F, class X>
-struct times {
-	typedef typename times<N - 1, F, X>::type type;
-};
+template<class X>
+struct two_pointers
+: twice<typename mpl::lambda<boost::add_pointer<_1>>::type, X> {};
 
-template<template <class> class F, class X>
-struct times<1, F, X> {
-	typedef typename F<X>::type type;
-};
 
 
 int main() {
-	// static_assert(traits::is_same<twice<add_pointer, int>::type, int**>::value, "");
-	static_assert(traits::is_same<twice<add_pointer, int>::type, int**>::value, "");
+	static_assert(std::is_same<twice<add_pointer, int>::type, int**>::value, "");
 	return 0;
 }

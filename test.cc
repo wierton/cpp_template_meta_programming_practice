@@ -1,9 +1,14 @@
 #include <iostream>
+#include <random>
 
 #include "traits.h"
 
+class A {
+public:
+	A(int a, int b, const char *c) { }
+};
+
 int main() {
-#define print(...) std::cout << #__VA_ARGS__ << ":\t" << (__VA_ARGS__) << std::endl
-	print(traits::format<decltype(nullptr)>::to_string());
+	A a = {1, 2, "123"};
 	return 0;
 }

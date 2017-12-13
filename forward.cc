@@ -43,28 +43,28 @@ void func_lref(T & arg) {
 template<typename _Tp>
 constexpr _Tp&& std_forward(typename std::remove_reference<_Tp>::type& __t) noexcept
 { 
-	std::cout << "call &\t";
+	std::cout << "call &  ";
 	return static_cast<_Tp&&>(__t);
 }
 
 template<typename _Tp>
 constexpr _Tp&& std_forward(typename std::remove_reference<_Tp>::type&& __t) noexcept
 { 
-	std::cout << "call &&\t";
+	std::cout << "call && ";
 	return static_cast<_Tp&&>(__t);
 }
 
 // forward lvalue
 template<class T>
 constexpr T && forward(std::remove_reference_t<T> & arg) noexcept {
-	std::cout << "call &\t";
+	std::cout << "call &  ";
 	return static_cast<T &&>(arg);
 }
 
 // forward rvalue
 template<class T>
 constexpr T && forward(std::remove_reference_t<T> && arg) noexcept {
-	std::cout << "call &&\t";
+	std::cout << "call && ";
 	return static_cast<T &&>(arg);
 }
 
@@ -74,40 +74,34 @@ void test_func(int && arg) { std::cout << "test_func(int &&)\n"; }
 
 template<class T>
 void before_forward(T && arg) {
-	std::cout << traits::format<decltype(arg)>::to_string()
-		<< "\t";
-	test_func(arg);
+	std::cout.width(13);
+	std::cout << traits::format<T>::to_string();
+	std::cout.width(13);
+	std::cout << traits::format<decltype(arg)>::to_string();
+	std::cout << "  ";
+	test_func(forward<T>(arg));
 }
 
 template<class T>
 void after_forward(T && arg) {
-	std::cout << traits::format<T>::to_string()
-		<< "\t"
-		<< traits::format<decltype(arg)>::to_string()
-		<< "\t";
-	// test_func(std::forward<T>(arg));
-	test_func(std::forward<T>(arg));
+	std::cout.width(13);
+	std::cout << traits::format<T>::to_string();
+	std::cout.width(13);
+	std::cout << traits::format<decltype(arg)>::to_string();
+	std::cout << "  ";
+	test_func(forward<T>(arg));
 }
 
 template<class T>
 void my_forward(T && arg) {
-	std::cout << "myforward(T &&):\t";
-	std::cout << traits::format<T>::to_string()
-		<< "\t"
-		<< traits::format<decltype(arg)>::to_string()
-		<< "\t";
+	std::cout.width(13);
+	std::cout << traits::format<T>::to_string();
+	std::cout.width(13);
+	std::cout << traits::format<decltype(arg)>::to_string();
+	std::cout << "  ";
 	test_func(forward<T>(arg));
 }
 
-template<class T>
-void my_forward(T & arg) {
-	std::cout << "myforward(T &): \t";
-	std::cout << traits::format<T>::to_string()
-		<< "\t"
-		<< traits::format<decltype(arg)>::to_string()
-		<< "\t";
-	test_func(forward<T>(arg));
-}
 
 int main() {
 	const int const_lvalue = 9;
