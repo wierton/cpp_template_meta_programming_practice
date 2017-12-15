@@ -4,7 +4,17 @@
 
 #include <type_traits>
 
+class A { };
+struct B { };
+union C { };
+
 int main() {
+	static_assert(traits::is_class<A>::value, "");;
+	static_assert(traits::is_class<B>::value, "");;
+	static_assert(traits::is_class<C>::value, "");;
+	static_assert(!traits::is_class<int>::value, "");;
+
+
 #define print(...) std::cout << #__VA_ARGS__ << ":\t" << (__VA_ARGS__) << std::endl
 	int p1[][4] = {{1, 2, 3, 4}, {5, 6, 7, 8}};
 	print(traits::format<std::decay<decltype(p1)>::type>::to_string());

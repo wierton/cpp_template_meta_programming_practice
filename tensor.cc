@@ -130,11 +130,30 @@ template<class T, size_t N>
 class Tensor {
 	Shape<N> shape;
 	T *data;
+	bool can_release;
 public:
-	Tensor(Shape<N> && shape) : shape(shape) {
+	Tensor(const Shape<N> & shape) :
+		shape(shape), can_release(true)
+	{
+		assert(shape.size_all() > 0);
 		data = new T [shape.size_all()];
 	}
 
+	Tensor(Shape<N> && shape) :
+		shape(std::move(shape)), can_release(true)
+	{
+		assert(shape.size_all() > 0);
+		data = new T [shape.size_all()];
+	}
+
+	Tensor(const Tensor & other) :
+		Tensor(other.shape)
+	{
+		std::copy(other.data, other.data + other.shape.size_all(), data);
+	}
+
+	Tensor &operator=(const Tensor &other) {
+	}
 };
 
 

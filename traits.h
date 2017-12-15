@@ -8,6 +8,19 @@
 namespace traits {
 
 template<class T>
+class is_class {
+	using yes = char[1];
+	using no = char[2];
+
+	template<class U>
+	static yes & test(void (U::*)());
+	template<class U>
+	static no & test(...);
+public:
+	enum { value = sizeof(test<T>(0)) == sizeof(yes) };
+};
+
+template<class T>
 struct not_ : std::integral_constant<bool, !T::value> { };
 
 
