@@ -96,13 +96,28 @@ void test() {
 
 	x = 3; y = 4; z = 5;
 
+	std::cout << "----begin----\n";
 	std::cout << a << " " << b << " " << c << "\n";
 	std::cout << x << " " << y << " " << z << "\n";
 	std::cout << "----end----\n";
 }
 
+void test_one() {
+	std::vector<int> va = {1, 2, 3, 4, 5};
+	std::cout << "----begin----\n";
+	for(auto &a : va) {
+		std::cout << a ++ << std::endl;
+	}
+	std::cout << "----\n";
+	for(auto a : va) {
+		std::cout << a << std::endl;
+	}
+	std::cout << "----end----\n";
+}
+
 int main() {
 	test();
+	test_one();
 
 	std::vector<int> va = {1, 2, 3, 4, 5};
 	std::vector<int> vb = {2, 3, 4, 5, 6, 7};
