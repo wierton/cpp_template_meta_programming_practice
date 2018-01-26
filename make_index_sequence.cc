@@ -30,10 +30,10 @@ struct make<0> : public seq<> {
 // [IMPORTANT]
 // for loop based on index sequence
 template<class Sequence>
-struct adder_impl;
+struct succ_impl;
 
 template<size_t...I>
-struct adder_impl<seq<I...>> {
+struct succ_impl<seq<I...>> {
 	template<class...TList>
 	static constexpr decltype(auto) apply(std::tuple<TList...> arg) {
 		return std::make_tuple( (std::get<I>(arg) + 1)... );
@@ -41,13 +41,13 @@ struct adder_impl<seq<I...>> {
 };
 
 template<class... TList>
-constexpr std::tuple<TList...> adder(std::tuple<TList...> arg) {
-	return adder_impl<typename make<sizeof...(TList)>::type>::apply(arg);
+constexpr std::tuple<TList...> succ(std::tuple<TList...> arg) {
+	return succ_impl<typename make<sizeof...(TList)>::type>::apply(arg);
 }
 
-void adder_test() {
+void succ_test() {
 	constexpr std::tuple<int, int, int, int> tup(1, 2, 0, 4);
-	constexpr auto new_tup = adder(tup);
+	constexpr auto new_tup = succ(tup);
 
 	static_assert(std::get<0>(new_tup) == 2, "");
 	static_assert(std::get<1>(new_tup) == 3, "");
@@ -65,18 +65,14 @@ constexpr size_t get(seq<F, I...> q) {
 	}
 }
 
+void make_test() {
+	auto seq = make<4>{};
+	static_assert(get<0>(seq) == 0, "");
+	static_assert(get<1>(seq) == 1, "");
+	static_assert(get<2>(seq) == 2, "");
+	static_assert(get<3>(seq) == 3, "");
+}
+
 int main() {
-	auto seq10 = make<10>{};
-	std::cout << get<0>(seq10) << " ";
-	std::cout << get<1>(seq10) << " ";
-	std::cout << get<2>(seq10) << " ";
-	std::cout << get<3>(seq10) << " ";
-	std::cout << get<4>(seq10) << " ";
-	std::cout << get<5>(seq10) << " ";
-	std::cout << get<6>(seq10) << " ";
-	std::cout << get<7>(seq10) << " ";
-	std::cout << get<8>(seq10) << " ";
-	std::cout << get<9>(seq10) << " ";
-	std::cout << "\n";
 	return 0;
 }
